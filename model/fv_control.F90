@@ -26,6 +26,8 @@
 ! FV control panel
 !----------------
 
+
+
 module fv_control_mod
 ! Modules Included:
 ! <table>
@@ -656,7 +658,7 @@ module fv_control_mod
 !!
 !> \param[in] layout Integer(2): Processor layout on each tile. The number of PEs assigned to a domain must equal layout(1)*layout(2)*ntiles. Must be set. 
 !!
-[npx]  Integer: Number of grid *corners* in the x-direction on one tile of the domain; so one more than the number of grid cells across a tile. On the cubed sphere this is *one* *more* *than* the number of cells across a cube face. Must be set.
+!> \param[in] npx  Integer: Number of grid *corners* in the x-direction on one tile of the domain; so one more than the number of grid cells across a tile. On the cubed sphere this is *one* *more* *than* the number of cells across a cube face. Must be set.
 !! 
 !> \param[in] npy Integer: Number of grid *corners* in the y-direction on one tile of the domain. This value should be identical to npx on a cubed-sphere grid; doubly periodic or nested grids do not have this restriction. Must be set.
 !! 
@@ -792,8 +794,7 @@ module fv_control_mod
 !!
 !> \param[in] stretch\_fac  Real: stretching factor for the Schmidt transformation. This is the factor by which tile 6 of the cubed sphere will be shrunk, with the grid size shrinking accordingly. 1 by default, which performs no grid stretching. Requires do\_schmidt  =.true. The model will crash if stretch\_fac is set to zero. Values of up to 40 have been found useful and stable for short-term cloud-scale integrations.
 !!
-!> \param[in] target\_lat  Real: latitude (in degrees) to which the center of tile 6 will be rotated; if stretching is done with stretch\_fac the center of the high-resolution part of the grid will be at this latitude. 
--90 by default, which does no grid rotation (the Schmidt transformation rotates the south pole to the appropriate target). Requires do\_schmidt =.true. 
+!> \param[in] target\_lat  Real: latitude (in degrees) to which the center of tile 6 will be rotated; if stretching is done with stretch\_fac the center of the high-resolution part of the grid will be at this latitude.  -90 by default, which does no grid rotation (the Schmidt transformation rotates the south pole to the appropriate target). Requires do\_schmidt =.true. 
 !!
 !> \param[in] target\_lon  Real: longitude to which the center of tile 6 will be rotated. 0 by default. Requires do\_schmidt =.true.
 !!
@@ -954,8 +955,7 @@ module fv_control_mod
 !!
 !>##A.4 Entries in surf\_map\_nml
 !!
-!> \param[in] surf\_file  Character(len=128): File containing topography data. This file must be in NetCDF format. INPUT/topo1min.nc by default. 
-(Previous versions of the model have used 5 minute USGS data, which is not recommended.) 
+!> \param[in] surf\_file  Character(len=128): File containing topography data. This file must be in NetCDF format. INPUT/topo1min.nc by default. (Previous versions of the model have used 5 minute USGS data, which is not recommended.) 
 !!
 !> \param[in] nlon  Integer: Size of the longitude dimension in topography data; not used. 
 !!
@@ -983,8 +983,7 @@ module fv_control_mod
 !!
 !> \param[in] nest\_pes  Integer(100): array carrying number of PEs assigned to each grid, in order. Must be set if ngrids > 1. 
 !!
-!> \param[in] p\_split  Integer: number of times to sub-cycle dynamics, performing nested-grid BC interpolation and (if twowaynest ==.true.) two-way updating at the end of each set of dynamics calls. If p\_split  > 1
- the user should decrease k\_split appropriately so the remapping and dynamics time steps remain the same. 1 by default.
+!> \param[in] p\_split  Integer: number of times to sub-cycle dynamics, performing nested-grid BC interpolation and (if twowaynest ==.true.) two-way updating at the end of each set of dynamics calls. If p\_split  > 1 the user should decrease k\_split appropriately so the remapping and dynamics time steps remain the same. 1 by default.
 !!
 !> \param[in] imfdeep  These are options for a variety of convection schemes: for example IIRC imfdeep = 1 is old SAS, imfdeep = 2 is scaleaware SAS, 3 is either RAS or CS, etc. The best reference is to look for the options in GFS physics driver.F90      
 !!
@@ -1006,7 +1005,7 @@ module fv_control_mod
 !!
 !> \param[in] domains\_stack\_size  Integer: size (in bytes) of memory array reserved for domains. For large grids or reduced processor counts this can be large (>10 M); if it is not large enough the model will stop and print a recommended value of the stack size. Default is 0., reverting to the default set in MPP (which is probably not large enough for modern applications).
 !!
-!!@{ 
+!> @{ 
    namelist /fv_grid_nml/ grid_name, grid_file
    namelist /fv_core_nml/npx, npy, ntiles, npz, npz_rst, layout, io_layout, ncnst, nwat,  &
                          use_logp, p_fac, a_imp, k_split, n_split, m_split, q_split, print_freq, write_3d_diags, do_schmidt,  &
