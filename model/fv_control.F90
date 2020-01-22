@@ -26,8 +26,6 @@
 ! FV control panel
 !----------------
 
-
-
 module fv_control_mod
 ! Modules Included:
 ! <table>
@@ -594,17 +592,18 @@ module fv_control_mod
 
 !>@brief The subroutine 'fv_end' terminates FV3, deallocates memory, 
 !! saves restart files, and stops I/O.
- subroutine fv_end(Atm, grids_on_this_pe)
+ subroutine fv_end(Atm, grids_on_this_pe, restart_endfcst)
 
     type(fv_atmos_type), intent(inout) :: Atm(:)
     logical, intent(INOUT) :: grids_on_this_pe(:)
+    logical, intent(in) :: restart_endfcst
 
     integer :: n
 
     call timing_off('TOTAL')
     call timing_prt( gid )
 
-    call fv_restart_end(Atm, grids_on_this_pe)
+    call fv_restart_end(Atm, grids_on_this_pe, restart_endfcst)
     call fv_io_exit()
 
   ! Free temporary memory from sw_core routines
@@ -985,15 +984,11 @@ module fv_control_mod
 !!
 !> \param[in] p\_split  Integer: number of times to sub-cycle dynamics, performing nested-grid BC interpolation and (if twowaynest ==.true.) two-way updating at the end of each set of dynamics calls. If p\_split  > 1 the user should decrease k\_split appropriately so the remapping and dynamics time steps remain the same. 1 by default.
 !!
-!> \param[in] imfdeep  These are options for a variety of convection schemes: for example IIRC imfdeep = 1 is old SAS, imfdeep = 2 is scaleaware SAS, 3 is either RAS or CS, etc. The best reference is to look for the options in GFS physics driver.F90      
-!!
-!> \param[in] do\_deep  The correct options to disable the convection schemes are do deep = .F. and shal cnv =.F.         
-!!
 !>##A.8 Entries in nggps\_diag\_nml
 !!
 !> \param[in] fdiag  Real(1028): Array listing the diagnostic output times (in hours) for the GFS physics. This can either be a list of times after initialization, or an interval if only the first entry is nonzero. All 0 by default, which will result in no outputs. 
 !!
-!>##A.9 Entries in atmos\_model\_nml (for fvGFS)FV&sup3
+!>##A.9 Entries in atmos\_model\_nml (for UFS)
 !!
 !> \param[in] blocksize  Integer: Number of columns in each ``block'' sent to the physics. OpenMP threading is done over the number of blocks. For best performance this number should divide the number of grid cells per processor ( (npx-1)*(npy-1) /(layout\_x)*(layout\_y) ) and be small enough so the data can best fit into cache?values around 32 appear to be optimal on Gaea. 1 by default
 !!
@@ -1005,6 +1000,19 @@ module fv_control_mod
 !!
 !> \param[in] domains\_stack\_size  Integer: size (in bytes) of memory array reserved for domains. For large grids or reduced processor counts this can be large (>10 M); if it is not large enough the model will stop and print a recommended value of the stack size. Default is 0., reverting to the default set in MPP (which is probably not large enough for modern applications).
 !!
+!>##A.11
+!!
+!> \param[in] regional Logical: Controls whether this is a regional domain (and thereby needs external BC inputs
+!!
+!> \param[in] bc_update_interval Integer: Default setting for interval (hours) between external regional BC data files.
+!!
+!> \param[in] read_increment  Logical: Read in analysis increment and add to restart following are namelist parameters for Stochastic Energy Baskscatter dissipation estimate. This is useful as part of a data-assimilation cycling system or to use native restarts from the six-tile first guess, after which the analysis increment can be applied. 
+!!
+!> \param[in] do_sat_adj  Logical: The same as fast_sat_adj = .false.  has fast saturation adjustments
+!!
+!!
+!!
+!! 
 !> @{ 
    namelist /fv_grid_nml/ grid_name, grid_file
    namelist /fv_core_nml/npx, npy, ntiles, npz, npz_rst, layout, io_layout, ncnst, nwat,  &
